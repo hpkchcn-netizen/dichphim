@@ -1,154 +1,243 @@
-# DichPhim - AI Movie Translator & Dubber
+# Dịch Phim (DichPhim) - Vietnamese Video Dubbing Tool
 
-🎬 Phần mềm dịch và lồng tiếng phim tự động bằng AI, tương tự CapCut AI, HeyGen, Rask AI.
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
+![Status](https://img.shields.io/badge/status-Alpha-yellow.svg)
 
-## ✨ Tính năng
+## Overview
 
-- ✅ **Nhận diện giọng nói** tự động (Whisper)
-- ✅ **Dịch đa ngôn ngữ** (GPT-4, Gemini, DeepL)
-- ✅ **Tạo lồng tiếng** (Edge TTS, XTTS, Fish Speech)
-- ✅ **Clone giọng** nhân vật (XTTS v2, F5-TTS)
-- ✅ **Đồng bộ môi** (Wav2Lip, LatentSync)
-- ✅ **Ghép video** tự động (FFmpeg)
+**Dịch Phim** is an automated Vietnamese video dubbing tool that combines:
+- 🎬 **AI-powered translation** (Google Cloud Translate)
+- 🔊 **Text-to-Speech** (Edge TTS)
+- 📝 **Subtitle synchronization** (SRT/VTT support)
+- 👄 **Lip-sync adjustment** (ML-based)
+- 🎞️ **Video processing** (FFmpeg + OpenCV)
 
-## 🏗️ Kiến trúc
+Automatic dubbing for international content into Vietnamese with lip-sync correction.
+
+## Features
+
+✨ **Core Features:**
+- Auto-extract audio from videos
+- Speech-to-text recognition
+- AI translation (English → Vietnamese)
+- Natural Vietnamese TTS synthesis
+- SRT/VTT subtitle processing
+- Lip-sync correction using ML
+- Multi-format video support (MP4, MKV, AVI, etc.)
+- Batch processing
+- Progress tracking with tqdm
+
+## Installation
+
+### Prerequisites
+- Python 3.8+
+- FFmpeg installed on your system
+
+```bash
+# Clone the repository
+git clone https://github.com/hpkchcn-netizen/dichphim.git
+cd dichphim
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Or install as a package
+pip install -e .
+```
+
+### FFmpeg Setup
+
+**Ubuntu/Debian:**
+```bash
+sudo apt-get install ffmpeg
+```
+
+**MacOS:**
+```bash
+brew install ffmpeg
+```
+
+**Windows:**
+Download from [ffmpeg.org](https://ffmpeg.org/download.html)
+
+## Quick Start
+
+```python
+from dichphim import VideoDubber
+
+# Initialize
+dubber = VideoDubber()
+
+# Process a video
+result = dubber.dub(
+    input_video="movie.mp4",
+    output_video="movie_vn.mp4",
+    source_language="en",
+    target_language="vi"
+)
+
+print(f"Dubbed video: {result['output_path']}")
+```
+
+## Project Structure
 
 ```
 dichphim/
-├── README.md
+├── dichphim/
+│   ├── __init__.py
+│   ├── audio/
+│   │   ├── extractor.py      # Audio extraction
+│   │   ├── synthesizer.py    # TTS synthesis
+│   │   └── merger.py         # Audio merging
+│   ├── subtitle/
+│   │   ├── parser.py         # SRT/VTT parsing
+│   │   ├── translator.py     # Translation service
+│   │   └── synchronizer.py   # Sync adjustment
+│   ├── video/
+│   │   ├── processor.py      # Video processing
+│   │   ├── detector.py       # Face/lip detection
+│   │   └── renderer.py       # Video rendering
+│   ├── ml/
+│   │   ├── lipsync.py        # Lip-sync model
+│   │   └── alignment.py      # Speech alignment
+│   └── core.py               # Main dubber class
+├── tests/
+├── examples/
 ├── requirements.txt
-├── config.py
-├── app.py
-├── .env.example
-├── .gitignore
-│
-├── audio/              # Xử lý âm thanh
-│   ├── __init__.py
-│   ├── extract.py
-│   ├── merge.py
-│   └── normalize.py
-│
-├── stt/                # Speech-to-Text (Whisper)
-│   ├── __init__.py
-│   └── whisper_engine.py
-│
-├── translate/          # Dịch văn bản
-│   ├── __init__.py
-│   ├── gpt.py
-│   ├── gemini.py
-│   └── deepl.py
-│
-├── tts/                # Text-to-Speech
-│   ├── __init__.py
-│   ├── edge_tts.py
-│   ├── xtts.py
-│   └── fishspeech.py
-│
-├── subtitle/           # Xử lý phụ đề
-│   ├── __init__.py
-│   ├── srt.py
-│   └── timing.py
-│
-├── video/              # Xử lý video
-│   ├── __init__.py
-│   └── ffmpeg_ops.py
-│
-├── lipsync/            # Lip Sync
-│   ├── __init__.py
-│   └── wav2lip.py
-│
-└── pipeline/           # Main processor
-    ├── __init__.py
-    └── processor.py
+├── setup.py
+├── README.md
+└── LICENSE
 ```
 
-## 🚀 Cài đặt
+## Configuration
 
-### 1. Clone repository
+Create a `.env` file in the project root:
+
+```env
+# Google Cloud Translation
+GOOGLE_CLOUD_PROJECT_ID=your-project-id
+GOOGLE_APPLICATION_CREDENTIALS=path/to/credentials.json
+
+# Optional settings
+MAX_WORKERS=4
+DEBUG=False
+```
+
+## API Reference
+
+### VideoDubber
+
+```python
+class VideoDubber:
+    def dub(
+        self,
+        input_video: str,
+        output_video: str,
+        source_language: str = "en",
+        target_language: str = "vi",
+        subtitle_file: Optional[str] = None,
+        enable_lipsync: bool = True,
+        output_format: str = "mp4"
+    ) -> Dict[str, Any]
+```
+
+## Examples
+
+See the `examples/` directory for:
+- Basic video dubbing
+- Batch processing
+- Subtitle-only translation
+- Custom TTS voices
+
+## Development
+
+### Setup Development Environment
+
 ```bash
-git clone https://github.com/hpkchcn-netizen/dichphim.git
-cd dichphim
+# Install with dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Code formatting
+black dichphim/
+
+# Linting
+flake8 dichphim/
+
+# Type checking
+mypy dichphim/
 ```
 
-### 2. Tạo virtual environment
+## Performance
+
+- **Video processing:** ~2-5x realtime (depends on resolution)
+- **Translation:** ~500 words/minute
+- **TTS:** ~100-200 words/minute
+- **Lip-sync:** ~5-10x realtime
+
+## Limitations
+
+⚠️ **Current Alpha Limitations:**
+- Works best with clear audio and frontal face angles
+- Lip-sync accuracy varies by video quality
+- Limited language support (English → Vietnamese)
+- Subtitle file required for best results
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+## Troubleshooting
+
+### Common Issues
+
+**FFmpeg not found:**
 ```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
+# Add FFmpeg to PATH or specify location
+export FFMPEG_PATH=/path/to/ffmpeg
 ```
 
-### 3. Cài dependencies
+**Google Cloud authentication error:**
 ```bash
-pip install -r requirements.txt
+# Ensure credentials are set
+export GOOGLE_APPLICATION_CREDENTIALS=path/to/key.json
 ```
 
-### 4. Cài FFmpeg
-```bash
-# Ubuntu/Debian
-sudo apt-get install ffmpeg
+## Roadmap
 
-# macOS
-brew install ffmpeg
+- [ ] Support for more languages
+- [ ] Improved lip-sync accuracy
+- [ ] GPU acceleration
+- [ ] Web UI
+- [ ] Cloud API service
 
-# Windows
-choco install ffmpeg
-```
+## License
 
-### 5. Tạo file `.env`
-```bash
-cp .env.example .env
-```
+MIT License - see [LICENSE](LICENSE) file
 
-Sửa `.env` và thêm API keys:
-```
-OPENAI_API_KEY=your_key
-GEMINI_API_KEY=your_key
-DEEPL_API_KEY=your_key
-```
+## Author
 
-## 💻 Sử dụng
+**hpkchcn-netizen**
+- GitHub: [@hpkchcn-netizen](https://github.com/hpkchcn-netizen)
+- Email: hpkchcn@gmail.com
 
-### GUI Mode
-```bash
-python app.py
-```
+## Acknowledgments
 
-### CLI Mode
-```bash
-python -m pipeline.processor \
-  --input movie.mp4 \
-  --output movie_vi.mp4 \
-  --source-lang en \
-  --target-lang vi
-```
+- Google Cloud Translation API
+- Edge TTS library
+- FFmpeg community
+- OpenCV project
 
-## 🔧 Pipeline xử lý
+## Support
 
-1. **Tách âm thanh** → `audio.wav`
-2. **STT (Whisper)** → segments với timestamp
-3. **Dịch** → text tiếng Việt
-4. **TTS** → audio tiếng Việt
-5. **Time Stretch** → khớp duration
-6. **Voice Clone** (tuỳ chọn) → nghe giống diễn viên
-7. **Lip Sync** (tuỳ chọn) → miệng khớp tiếng
-8. **Ghép Video** → output final
+For issues and questions:
+- 🐛 [Bug Reports](https://github.com/hpkchcn-netizen/dichphim/issues)
+- 💬 [Discussions](https://github.com/hpkchcn-netizen/dichphim/discussions)
+- 📧 Email: hpkchcn@gmail.com
 
-## 📦 Technologies
+---
 
-| Chức năng | Công nghệ |
-|-----------|----------|
-| Giao diện | CustomTkinter / Tkinter |
-| Video | FFmpeg |
-| STT | Whisper Large-v3 |
-| Dịch | GPT-4 / Gemini / DeepL |
-| TTS | Edge TTS / XTTS / Fish Speech |
-| Clone | XTTS v2 / F5-TTS |
-| Lip Sync | Wav2Lip / LatentSync |
-
-## 📝 License
-
-MIT License
-
-## 👨‍💻 Author
-
-[@hpkchcn-netizen](https://github.com/hpkchcn-netizen)
+**Made with ❤️ for Vietnamese content creators**
